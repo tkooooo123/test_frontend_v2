@@ -5,7 +5,7 @@
       <ETextField :label="'姓名'" v-model="form.name" :id="'name'" :type="'text'" />
       <ETextField :label="'年齡'" class="mt-2" v-model="form.age" :id="'age'" :type="'number'" />
       <div class="flex justify-end mt-4">
-        <EBtn :text="'修改'" :color="'success'" class="mr-4" />
+        <EBtn :text="'修改'" :color="'success'" class="mr-4" @click="openDialog('edit')" />
         <EBtn :text="'新增'" :color="'warn'" @click="openDialog('add')" />
       </div>
     </div>
@@ -26,7 +26,11 @@
             <td>{{ user.age }}</td>
             <td>
               <div class="flex justify-center">
-                <EBtn :text="'修改'" :color="'success'" class="mr-4" />
+                <EBtn :text="'修改'" :color="'success'" class="mr-4" @click="() => {
+                  currentUserId = user.id
+                  form.name = user.name
+                  form.age = user.age
+                }" />
                 <EBtn :text="'刪除'" :color="'error'" @click="openDialog('delete', user)" />
               </div>
             </td>
@@ -70,7 +74,23 @@ const handleSubmit = async () => {
       name: form.name,
       age: Number(form.age)
     })
-    console.log(res)
+    if (res.status === 200) {
+      form.name = ''
+      form.age = null
+      await fetchUsers()
+    }
+  } catch (err) {
+    console.error(err)
+  }
+}
+// 修改功能
+const handleEdit = async () => {
+  try {
+    const res = await axios.put(`${baseUrl}/user`, {
+      name: form.name,
+      age: Number(form.age),
+      id: currentUserId.value
+    })
     if (res.status === 200) {
       form.name = ''
       form.age = null
@@ -106,11 +126,18 @@ const openDialog = (action: ActionType, user?: User) => {
   if (user) {
     currentUserId.value = user?.id
   }
-  if (action === 'add') dialogMessage.value = '確定要新增這筆資料嗎？'
-  if (action === 'edit') {
-    dialogMessage.value = `確定要修改使用者「${user?.name}」 嗎？`
+  if (action === 'add' && currentUserId.value) {
+    form.name = ''
+    form.age = null
+    currentUserId.value = undefined
+    return
+  } else if (action === 'add') {
+    dialogMessage.value = '確定要新增這筆資料嗎？'
   }
-  if (action === 'delete') dialogMessage.value = `確定要刪除使用者「${user?.name}」嗎？`
+  if (action === 'edit') {
+    dialogMessage.value = `確定要修改使用者 #「${currentUserId.value}」 嗎？`
+  }
+  if (action === 'delete') dialogMessage.value = `確定要刪除使用者 #「${user?.id}」嗎？`
   confirmDialog.value?.showModal()
 }
 // 關閉 dialog
@@ -126,6 +153,9 @@ const confirmAction = () => {
     }
     if (currentAction.value === 'add') {
       handleSubmit()
+    }
+    if (currentAction.value === 'edit') {
+      handleEdit()
     }
   } catch (err) {
     console.error(err)
