@@ -20,4 +20,18 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {})
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+/* Chrome, Safari, Edge, Opera */
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  appearance: none; 
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+  appearance: textfield; 
+}
+</style>
