@@ -1,5 +1,6 @@
 <template>
-  <button class="e-btn rounded-2 cursor-pointer border-none text-4" :class="`e-btn-${color}`">
+  <button class="e-btn rounded-2 cursor-pointer border-none text-3.5 sm:text-4 px-1.5 sm:px-4"
+    :class="`e-btn-${color}`">
     {{ text }}
     <slot v-if="!text" />
   </button>
@@ -19,7 +20,7 @@ const props = withDefaults(defineProps<Props>(), {
 <style scoped lang="scss">
 .e-btn {
   height: 40px;
-  padding: 0 16px;
+  transition: all 0.2s ease-in-out;
 
   // success 綠
   &-success {
@@ -40,6 +41,14 @@ const props = withDefaults(defineProps<Props>(), {
     background: #f9c13f;
     color: black;
     font-weight: 600;
+  }
+
+  &:hover {
+    transform: scale(1.05);
+  }
+
+  &:active {
+    opacity: 0.8;
   }
 }
 </style>

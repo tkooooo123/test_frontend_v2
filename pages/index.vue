@@ -1,58 +1,57 @@
 <template>
   <div class="bg-#2a2a2a min-h-100vh">
-    <div class="flex justify-end px-6 text-white">
+    <div class="flex justify-end px-6 pt-4 text-white">
       <EBtn :text="'中文'" @click="switchLocale('zh-TW')" />
       <EBtn :text="'English'" class="ml-2" @click="switchLocale('en-US')" />
     </div>
-    <div class="flex flex-col items-center justify-center">
-      <div class="w-100 min-h-60 p-6 border-1 border-solid border-#757575 rounded-2">
-    
-    <h2 class="text-center text-white text-2xl font-bold`">{{ t('operation') }}</h2>
-    <ETextField :label="t('name')" v-model="form.name" :id="'name'" :type="'text'" />
-    <p v-if="errors.name" class="text-3 text-red-500 mt-1">{{ errors.name }}</p>
-    <ETextField :label="t('age')" class="mt-2" v-model="form.age" :id="'age'" :type="'number'" min="0"/>
-    <p v-if="errors.age" class="text-3 text-red-500 mt-1">{{ errors.age }}</p>
-    <div class="flex justify-end mt-4">
-      <EBtn :text="t('edit')" :color="'success'" class="mr-4" @click="openDialog('edit')" />
-      <EBtn :text="t('add')" :color="'warn'" @click="openDialog('add')" />
+    <div class="flex flex-col items-center justify-center mt-2 px-4">
+      <div class="max-w-full w-80% sm:w-100 min-h-60 p-6 border-1 border-solid border-#757575 rounded-2">
+        <h2 class="text-center text-white text-2xl font-bold`">{{ t('operation') }}</h2>
+        <ETextField :label="t('name')" v-model="form.name" :id="'name'" :type="'text'" />
+        <p v-if="errors.name" class="text-3 text-red-500 mt-1">{{ errors.name }}</p>
+        <ETextField :label="t('age')" class="mt-2" v-model="form.age" :id="'age'" :type="'number'" min="0" />
+        <p v-if="errors.age" class="text-3 text-red-500 mt-1">{{ errors.age }}</p>
+        <div class="flex justify-end mt-4">
+          <EBtn :text="t('edit')" :color="'success'" class="mr-2 sm:mr-4" @click="openDialog('edit')" />
+          <EBtn :text="t('add')" :color="'warn'" @click="openDialog('add')" />
+        </div>
+      </div>
+      <div class="w-80% sm:w-100 mt-4 p-6 border-1 border-solid border-#757575 rounded-2" v-if="users.length > 0">
+        <table class="text-white text-center w-full">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>{{ t('name') }}</th>
+              <th class="w-10">{{ t('age') }}</th>
+              <th>{{ t('operation') }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="user in users" :key="user.id" >
+              <td>{{ user.id }}</td>
+              <td>{{ user.name }}</td>
+              <td>{{ user.age }}</td>
+              <td>
+                <div class="flex justify-center">
+                  <EBtn :text="t('edit')" :color="'success'" class="mr-2 sm:mr-4" @click="() => {
+                    currentUserId = user.id
+                    form.name = user.name
+                    form.age = user.age
+                  }" />
+                  <EBtn :text="t('delete')" :color="'error'" @click="openDialog('delete', user)" />
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
-  <div class="w-100 mt-4 p-6 border-1 border-solid border-#757575 rounded-2" v-if="users.length > 0">
-    <table class="text-white text-center w-full">
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>{{ t('name') }}</th>
-          <th class="w-10">{{ t('age') }}</th>
-          <th>{{ t('operation') }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="user in users" :key="user.id">
-          <td>{{ user.id }}</td>
-          <td>{{ user.name }}</td>
-          <td>{{ user.age }}</td>
-          <td>
-            <div class="flex justify-center">
-              <EBtn :text="t('edit')" :color="'success'" class="mr-4" @click="() => {
-                currentUserId = user.id
-                form.name = user.name
-                form.age = user.age
-              }" />
-              <EBtn :text="t('delete')" :color="'error'" @click="openDialog('delete', user)" />
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-    </div>
-   
+
     <!-- 確認 dialog -->
     <dialog ref="confirmDialog" class="rounded-4 border-none">
       <p>{{ dialogMessage }}</p>
       <div class="flex justify-end mt-2">
-        <EBtn :text="t('cancel')" :color="'error'" class="mr-4" @click="closeDialog" />
+        <EBtn :text="t('cancel')" :color="'error'" class="mr-2 sm:mr-4" @click="closeDialog" />
         <EBtn :text="t('confirm')" :color="'success'" @click="confirmAction" />
       </div>
     </dialog>
@@ -63,7 +62,7 @@
 import axios from 'axios'
 import { useI18n } from 'vue-i18n'
 
-const { t, setLocale  } = useI18n()
+const { t, setLocale } = useI18n()
 // 切換語系
 const switchLocale = (lang: 'zh-TW' | 'en-US') => {
   setLocale(lang)
@@ -87,7 +86,7 @@ const form = reactive<User>({
 // 新增功能
 const handleSubmit = async () => {
   try {
-    if(!validateForm()) {
+    if (!validateForm()) {
       return
     }
     const res = await axios.post(`${baseUrl}/user`, {
@@ -106,7 +105,7 @@ const handleSubmit = async () => {
 // 修改功能
 const handleEdit = async () => {
   try {
-    if(!validateForm()) {
+    if (!validateForm()) {
       return
     }
     const res = await axios.put(`${baseUrl}/user`, {
@@ -196,7 +195,7 @@ const errors = reactive<FormErrors>({
   name: '',
   age: ''
 })
-const validateForm = () =>{
+const validateForm = () => {
   let isValid = true
   errors.name = ''
   errors.age = ''
@@ -205,7 +204,7 @@ const validateForm = () =>{
     errors.name = t('error.name_required')
     isValid = false
   }
-// 驗證年齡
+  // 驗證年齡
   if (typeof form.age === 'string' && !form.age.trim()) {
     errors.age = t('error.age_required')
     isValid = false
@@ -214,8 +213,26 @@ const validateForm = () =>{
 }
 onMounted(() => {
   fetchUsers()
- 
+
 })
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+table {
+  border-collapse: collapse;
+}
+tbody {
+  tr {
+    transition: all 0.2s ease-in-out;
+    border-bottom: 1px solid #757575 ;
+    &:hover {
+      background: #ececec;
+      color:black;
+    }
+  }
+  td {
+    padding: 8px 0;
+    
+  }
+}
+</style>
