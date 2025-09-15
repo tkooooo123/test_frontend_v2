@@ -5,11 +5,13 @@
       <EBtn :text="'English'" class="ml-2" @click="switchLocale('en-US')" />
     </div>
     <div class="flex flex-col items-center justify-center">
-      <div class="w-100 h-60 p-6 border-1 border-solid border-#757575 rounded-2">
+      <div class="w-100 min-h-60 p-6 border-1 border-solid border-#757575 rounded-2">
     
     <h2 class="text-center text-white text-2xl font-bold`">{{ t('operation') }}</h2>
     <ETextField :label="t('name')" v-model="form.name" :id="'name'" :type="'text'" />
-    <ETextField :label="t('age')" class="mt-2" v-model="form.age" :id="'age'" :type="'number'" />
+    <p v-if="errors.name" class="text-3 text-red-500 mt-1">{{ errors.name }}</p>
+    <ETextField :label="t('age')" class="mt-2" v-model="form.age" :id="'age'" :type="'number'" min="0"/>
+    <p v-if="errors.age" class="text-3 text-red-500 mt-1">{{ errors.age }}</p>
     <div class="flex justify-end mt-4">
       <EBtn :text="t('edit')" :color="'success'" class="mr-4" @click="openDialog('edit')" />
       <EBtn :text="t('add')" :color="'warn'" @click="openDialog('add')" />
@@ -71,7 +73,7 @@ const switchLocale = (lang: 'zh-TW' | 'en-US') => {
 interface User {
   name: string
   id?: number
-  age: number | null
+  age: number | string
 }
 const userStore = useUserStore()
 const { fetchUsers } = userStore
@@ -79,20 +81,22 @@ const { users } = storeToRefs(userStore)
 const baseUrl = 'https://38839.wu.elitepro.ltd/api' // 後端網址 將由面試官提供
 const form = reactive<User>({
   name: '',
-  age: null
+  age: ''
 })
 
 // 新增功能
 const handleSubmit = async () => {
   try {
-
+    if(!validateForm()) {
+      return
+    }
     const res = await axios.post(`${baseUrl}/user`, {
       name: form.name,
       age: Number(form.age)
     })
     if (res.status === 200) {
       form.name = ''
-      form.age = null
+      form.age = ''
       await fetchUsers()
     }
   } catch (err) {
@@ -102,6 +106,9 @@ const handleSubmit = async () => {
 // 修改功能
 const handleEdit = async () => {
   try {
+    if(!validateForm()) {
+      return
+    }
     const res = await axios.put(`${baseUrl}/user`, {
       name: form.name,
       age: Number(form.age),
@@ -109,7 +116,7 @@ const handleEdit = async () => {
     })
     if (res.status === 200) {
       form.name = ''
-      form.age = null
+      form.age = ''
       await fetchUsers()
     }
   } catch (err) {
@@ -144,12 +151,11 @@ const openDialog = (action: ActionType, user?: User) => {
   }
   if (action === 'add' && currentUserId.value) {
     form.name = ''
-    form.age = null
+    form.age = ''
     currentUserId.value = undefined
     return
   } else if (action === 'add') {
     dialogMessage.value = t('confirm_add')
-    console.log(t('confirm_add'))
   }
   if (action === 'edit') {
     dialogMessage.value = t('confirm_edit', { id: currentUserId.value || '' })
@@ -179,8 +185,32 @@ const confirmAction = () => {
   } finally {
     confirmDialog.value?.close()
   }
+}
+// 表單驗證
+interface FormErrors {
+  name?: string
+  age?: string
+}
 
-
+const errors = reactive<FormErrors>({
+  name: '',
+  age: ''
+})
+const validateForm = () =>{
+  let isValid = true
+  errors.name = ''
+  errors.age = ''
+  // 驗證姓名
+  if (!form.name.trim()) {
+    errors.name = t('error.name_required')
+    isValid = false
+  }
+// 驗證年齡
+  if (typeof form.age === 'string' && !form.age.trim()) {
+    errors.age = t('error.age_required')
+    isValid = false
+  }
+  return isValid
 }
 onMounted(() => {
   fetchUsers()

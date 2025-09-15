@@ -4,7 +4,8 @@
       {{ label }}
     </label>
     <input class="w-full h-7 box-border bg-#2a2a2a mt-1 rounded-2 text-white" :id="id" :type="type" :value="modelValue"
-      @input="$emit('update:modelValue', ($event.target as HTMLInputElement)?.value)" />
+    v-bind="$attrs"   
+    @input="$emit('update:modelValue', ($event.target as HTMLInputElement)?.value)" />
   </div>
 </template>
 

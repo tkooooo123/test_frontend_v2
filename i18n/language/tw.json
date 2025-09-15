@@ -11,5 +11,9 @@
   "delete": "刪除",
   "confirm_add": "確定要新增這筆資料嗎？",
   "confirm_edit": "確定要修改使用者 #「{id}」嗎？",
-  "confirm_delete": "確定要刪除使用者 #「{id}」嗎？"
+  "confirm_delete": "確定要刪除使用者 #「{id}」嗎？",
+  "error": {
+    "name_required": "名字是必填的",
+    "age_required": "年齡是必填的"
+  }
 }

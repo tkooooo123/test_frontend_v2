@@ -11,5 +11,9 @@
   "delete": "Delete",
   "confirm_add": "Are you sure to add this user?",
   "confirm_edit": "Are you sure to edit user # \"{id}\"?",
-  "confirm_delete": "Are you sure to delete user # \"{id}\"?"
+  "confirm_delete": "Are you sure to delete user # \"{id}\"?",
+  "error": {
+    "name_required": "Name is required",
+    "age_required": "Age is required"
+  }
 }
