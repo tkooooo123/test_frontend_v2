@@ -6,16 +6,18 @@
       <ETextField :label="'年齡'" class="mt-2" v-model="form.age" :id="'age'" :type="'number'" />
       <div class="flex justify-end mt-4">
         <EBtn :text="'修改'" :color="'success'" class="mr-4" />
-        <EBtn :text="'新增'" :color="'warn'" @click="handleSubmit" />
+        <EBtn :text="'新增'" :color="'warn'" @click="openDialog('add')" />
       </div>
     </div>
-    <div class="w-100 mt-4 p-6 border-1 border-solid border-#757575 rounded-2">
+    <div class="w-100 mt-4 p-6 border-1 border-solid border-#757575 rounded-2" v-if="users.length > 0">
       <table class="text-white text-center w-full">
         <thead>
-          <th>#</th>
-          <th>名字</th>
-          <th class="w-10">年齡</th>
-          <th>操作</th>
+          <tr>
+            <th>#</th>
+            <th>名字</th>
+            <th class="w-10">年齡</th>
+            <th>操作</th>
+          </tr>
         </thead>
         <tbody>
           <tr v-for="user in users" :key="user.id">
@@ -25,13 +27,21 @@
             <td>
               <div class="flex justify-center">
                 <EBtn :text="'修改'" :color="'success'" class="mr-4" />
-                <EBtn :text="'刪除'" :color="'error'" />
+                <EBtn :text="'刪除'" :color="'error'" @click="openDialog('delete', user)" />
               </div>
             </td>
           </tr>
         </tbody>
       </table>
     </div>
+    <!-- 確認 dialog -->
+    <dialog ref="confirmDialog" class="rounded-4 border-none">
+      <p>{{ dialogMessage }}</p>
+      <div class="flex justify-end mt-2">
+        <EBtn :text="'取消'" :color="'error'" class="mr-4" @click="closeDialog" />
+        <EBtn :text="'確定'" :color="'success'" @click="confirmAction" />
+      </div>
+    </dialog>
   </div>
 </template>
 
@@ -40,6 +50,7 @@ import axios from 'axios'
 
 interface User {
   name: string
+  id?: number
   age: number | null
 }
 const userStore = useUserStore()
@@ -51,6 +62,7 @@ const form = reactive<User>({
   age: null
 })
 
+// 新增功能
 const handleSubmit = async () => {
   try {
 
@@ -58,11 +70,74 @@ const handleSubmit = async () => {
       name: form.name,
       age: Number(form.age)
     })
-  } catch {
+    console.log(res)
+    if (res.status === 200) {
+      form.name = ''
+      form.age = null
+      await fetchUsers()
+    }
+  } catch (err) {
+    console.error(err)
   }
 }
+// 刪除功能
+const handleDelete = async () => {
+  try {
+    const res = await axios.delete(`${baseUrl}/user`, {
+      data: { id: currentUserId.value }
+    })
+    if (res.status === 200) {
+      await fetchUsers()
+    }
+  } catch (err) {
+    console.error(err)
+  }
+}
+//確認 dialog 相關功能
+type ActionType = 'add' | 'edit' | 'delete'
+const confirmDialog = ref<HTMLDialogElement | null>(null)
+const currentAction = ref<ActionType | null>(null)
+const currentUserId = ref<number | undefined>()
+const dialogMessage = ref('')
 
-await fetchUsers()
+// 打開 dialog
+const openDialog = (action: ActionType, user?: User) => {
+  currentAction.value = action
+  if (user) {
+    currentUserId.value = user?.id
+  }
+  if (action === 'add') dialogMessage.value = '確定要新增這筆資料嗎？'
+  if (action === 'edit') {
+    dialogMessage.value = `確定要修改使用者「${user?.name}」 嗎？`
+  }
+  if (action === 'delete') dialogMessage.value = `確定要刪除使用者「${user?.name}」嗎？`
+  confirmDialog.value?.showModal()
+}
+// 關閉 dialog
+const closeDialog = () => {
+  confirmDialog.value?.close()
+  currentAction.value = null
+}
+// 點擊確認後執行操作
+const confirmAction = () => {
+  try {
+    if (currentAction.value === 'delete') {
+      handleDelete()
+    }
+    if (currentAction.value === 'add') {
+      handleSubmit()
+    }
+  } catch (err) {
+    console.error(err)
+  } finally {
+    confirmDialog.value?.close()
+  }
+
+
+}
+onMounted(() => {
+  fetchUsers()
+})
 </script>
 
 <style scoped lang="scss"></style>

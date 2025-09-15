@@ -13,14 +13,9 @@ export const useUserStore = defineStore('user', {
     // 這裡只能呼叫自己的 /api/user
     async fetchUsers() {
       try {
-        const { data, error } = await useFetch<User[]>('/api/user')
-
-        if (error.value) {
-          throw new Error(error.value.message)
-        }
-        this.users = data.value || []
+        const data: User[] = await $fetch('/api/user')
+        this.users = data || []
       } catch {
-
       }
     }
   }
