@@ -61,10 +61,10 @@
 import axios from 'axios'
 import { useI18n } from 'vue-i18n'
 
-const { t, locale } = useI18n()
+const { t, setLocale  } = useI18n()
 // 切換語系
 const switchLocale = (lang: 'zh-TW' | 'en-US') => {
-  locale.value = lang
+  setLocale(lang)
 }
 
 
@@ -149,6 +149,7 @@ const openDialog = (action: ActionType, user?: User) => {
     return
   } else if (action === 'add') {
     dialogMessage.value = t('confirm_add')
+    console.log(t('confirm_add'))
   }
   if (action === 'edit') {
     dialogMessage.value = t('confirm_edit', { id: currentUserId.value || '' })
