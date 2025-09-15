@@ -1,4 +1,15 @@
 {
   "welcome": "Welcome",
-  "test": "Test"
+  "test": "Test",
+  "name": "Name",
+  "age": "Age",
+  "operation": "Operation",
+  "confirm": "Confirm",
+  "cancel": "Cancel",
+  "add": "Add",
+  "edit": "Edit",
+  "delete": "Delete",
+  "confirm_add": "Are you sure to add this user?",
+  "confirm_edit": "Are you sure to edit user # \"{id}\"?",
+  "confirm_delete": "Are you sure to delete user # \"{id}\"?"
 }

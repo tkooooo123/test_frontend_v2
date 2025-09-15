@@ -1,4 +1,15 @@
 {
   "welcome": "歡迎",
-  "test": "測試"
+  "test": "測試",
+  "name": "名字",
+  "age": "年齡",
+  "operation": "操作",
+  "confirm": "確定",
+  "cancel": "取消",
+  "add": "新增",
+  "edit": "修改",
+  "delete": "刪除",
+  "confirm_add": "確定要新增這筆資料嗎？",
+  "confirm_edit": "確定要修改使用者 #「{id}」嗎？",
+  "confirm_delete": "確定要刪除使用者 #「{id}」嗎？"
 }

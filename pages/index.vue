@@ -1,49 +1,57 @@
 <template>
-  <div class="bg-#2a2a2a min-h-100vh flex flex-col items-center justify-center">
-    <div class="w-100 h-60 p-6 border-1 border-solid border-#757575 rounded-2">
-      <h2 class="text-center text-white text-2xl font-bold`">操作</h2>
-      <ETextField :label="'姓名'" v-model="form.name" :id="'name'" :type="'text'" />
-      <ETextField :label="'年齡'" class="mt-2" v-model="form.age" :id="'age'" :type="'number'" />
-      <div class="flex justify-end mt-4">
-        <EBtn :text="'修改'" :color="'success'" class="mr-4" @click="openDialog('edit')" />
-        <EBtn :text="'新增'" :color="'warn'" @click="openDialog('add')" />
-      </div>
+  <div class="bg-#2a2a2a min-h-100vh">
+    <div class="flex justify-end px-6 text-white">
+      <EBtn :text="'中文'" @click="switchLocale('zh-TW')" />
+      <EBtn :text="'English'" class="ml-2" @click="switchLocale('en-US')" />
     </div>
-    <div class="w-100 mt-4 p-6 border-1 border-solid border-#757575 rounded-2" v-if="users.length > 0">
-      <table class="text-white text-center w-full">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>名字</th>
-            <th class="w-10">年齡</th>
-            <th>操作</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="user in users" :key="user.id">
-            <td>{{ user.id }}</td>
-            <td>{{ user.name }}</td>
-            <td>{{ user.age }}</td>
-            <td>
-              <div class="flex justify-center">
-                <EBtn :text="'修改'" :color="'success'" class="mr-4" @click="() => {
-                  currentUserId = user.id
-                  form.name = user.name
-                  form.age = user.age
-                }" />
-                <EBtn :text="'刪除'" :color="'error'" @click="openDialog('delete', user)" />
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div class="flex flex-col items-center justify-center">
+      <div class="w-100 h-60 p-6 border-1 border-solid border-#757575 rounded-2">
+    
+    <h2 class="text-center text-white text-2xl font-bold`">{{ t('operation') }}</h2>
+    <ETextField :label="t('name')" v-model="form.name" :id="'name'" :type="'text'" />
+    <ETextField :label="t('age')" class="mt-2" v-model="form.age" :id="'age'" :type="'number'" />
+    <div class="flex justify-end mt-4">
+      <EBtn :text="t('edit')" :color="'success'" class="mr-4" @click="openDialog('edit')" />
+      <EBtn :text="t('add')" :color="'warn'" @click="openDialog('add')" />
     </div>
+  </div>
+  <div class="w-100 mt-4 p-6 border-1 border-solid border-#757575 rounded-2" v-if="users.length > 0">
+    <table class="text-white text-center w-full">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>{{ t('name') }}</th>
+          <th class="w-10">{{ t('age') }}</th>
+          <th>{{ t('operation') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="user in users" :key="user.id">
+          <td>{{ user.id }}</td>
+          <td>{{ user.name }}</td>
+          <td>{{ user.age }}</td>
+          <td>
+            <div class="flex justify-center">
+              <EBtn :text="t('edit')" :color="'success'" class="mr-4" @click="() => {
+                currentUserId = user.id
+                form.name = user.name
+                form.age = user.age
+              }" />
+              <EBtn :text="t('delete')" :color="'error'" @click="openDialog('delete', user)" />
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+    </div>
+   
     <!-- 確認 dialog -->
     <dialog ref="confirmDialog" class="rounded-4 border-none">
       <p>{{ dialogMessage }}</p>
       <div class="flex justify-end mt-2">
-        <EBtn :text="'取消'" :color="'error'" class="mr-4" @click="closeDialog" />
-        <EBtn :text="'確定'" :color="'success'" @click="confirmAction" />
+        <EBtn :text="t('cancel')" :color="'error'" class="mr-4" @click="closeDialog" />
+        <EBtn :text="t('confirm')" :color="'success'" @click="confirmAction" />
       </div>
     </dialog>
   </div>
@@ -51,6 +59,14 @@
 
 <script setup lang="ts">
 import axios from 'axios'
+import { useI18n } from 'vue-i18n'
+
+const { t, locale } = useI18n()
+// 切換語系
+const switchLocale = (lang: 'zh-TW' | 'en-US') => {
+  locale.value = lang
+}
+
 
 interface User {
   name: string
@@ -132,12 +148,12 @@ const openDialog = (action: ActionType, user?: User) => {
     currentUserId.value = undefined
     return
   } else if (action === 'add') {
-    dialogMessage.value = '確定要新增這筆資料嗎？'
+    dialogMessage.value = t('confirm_add')
   }
   if (action === 'edit') {
-    dialogMessage.value = `確定要修改使用者 #「${currentUserId.value}」 嗎？`
+    dialogMessage.value = t('confirm_edit', { id: currentUserId.value || '' })
   }
-  if (action === 'delete') dialogMessage.value = `確定要刪除使用者 #「${user?.id}」嗎？`
+  if (action === 'delete') dialogMessage.value = t('confirm_delete', { id: currentUserId.value || '' })
   confirmDialog.value?.showModal()
 }
 // 關閉 dialog
@@ -167,6 +183,7 @@ const confirmAction = () => {
 }
 onMounted(() => {
   fetchUsers()
+ 
 })
 </script>
 
