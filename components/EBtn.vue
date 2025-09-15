@@ -1,6 +1,7 @@
 <template>
-  <button>
-    <slot />
+  <button class="e-btn rounded-2 cursor-pointer border-none text-4" :class="`e-btn-${color}`">
+    {{ text }}
+    <slot v-if="!text" />
   </button>
 </template>
 
@@ -10,21 +11,35 @@ interface Props {
   color?: 'success' | 'error' | 'warn' // 預設為 success
 }
 
-const props = withDefaults(defineProps<Props>(), {})
+const props = withDefaults(defineProps<Props>(), {
+  color: 'success'
+})
 </script>
 
 <style scoped lang="scss">
 .e-btn {
+  height: 40px;
+  padding: 0 16px;
+
   // success 綠
   &-success {
+    background: #0e861e;
+    color: white;
+    font-weight: 600;
   }
 
   // error 紅
   &-error {
+    background: #ae1c18;
+    color: white;
+    font-weight: 600;
   }
 
   // warn 黃
   &-warn {
+    background: #f9c13f;
+    color: black;
+    font-weight: 600;
   }
 }
 </style>
